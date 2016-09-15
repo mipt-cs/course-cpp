@@ -57,7 +57,7 @@
 	void bad_incrementor(int x)
 	{
 		x++;
-		std::cout << 'x changed: ' << x << std::endl;
+		std::cout << "x changed: " << x << std::endl;
 	}
 
 Вызвать функцию `bad_incrementor()`, которая изменяет формальный параметр, и убедиться в том, что фактический параметр неизменен.
@@ -83,9 +83,9 @@
 	int main()
 	{
 		int x = 1;
-		std::cout << 'x initial: ' << x << std::endl;
+		std::cout << "x initial: " << x << std::endl;
 		good_incrementor(&x);
-		std::cout << 'x changed: ' << x << std::endl;
+		std::cout << "x changed: " << x << std::endl;
 		
 		return 0;
 	}
