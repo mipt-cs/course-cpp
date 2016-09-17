@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import os
 
 AUTHOR = 'Alexey Ermakov'
-SITENAME = 'Курс информатики на Python 3'
+SITENAME = 'Курс информатики на C++'
 SITEURL = ''
 
 PATH = 'content'
