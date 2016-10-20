@@ -2,7 +2,6 @@ TDD: класс вектора
 ##################
 
 :date: 2016-10-19 20:10
-:status: draft
 
 .. default-role:: code
 .. contents:: Содержание
