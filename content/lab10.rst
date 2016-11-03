@@ -1,7 +1,7 @@
 Арифметические драконы
 ######################
 
-:date: 2016-10-27 12:10
+:date: 2016-11-03 14:00
 :lecture_link: https://youtu.be/4AsZqlm8nOA
 
 .. default-role:: code
