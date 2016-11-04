@@ -2,7 +2,6 @@
 ######################
 
 :date: 2016-11-03 14:00
-:lecture_link: https://youtu.be/4AsZqlm8nOA
 
 .. default-role:: code
 .. contents:: Содержание
@@ -13,3 +12,9 @@
 Сделайте форк репозитория `arithmetical_dragons`__.
 
 .. __: https://github.com/mipt-cs-on-cpp/arithmetical_dragons.git 
+
+Добейтесь работоспособности игры:
+1. Создайте необходимые методы у класса `Hero`.
+2. Создайте классы `RedDragon` и `BlackDragon` по аналогии с `GreenDragon`.
+3. Разберитесь почему требуется реализация метода класса `Dragon`, хотя ни одного экземпляра этого класса не требуется.
+4. Сделайте класс `Dragon` чистым абстрактным классом.
