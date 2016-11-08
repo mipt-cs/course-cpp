@@ -2,6 +2,7 @@ TDD: класс вектора
 ##################
 
 :date: 2016-10-19 20:10
+:lecture_link: https://youtu.be/1A4MrIfVMTI
 
 .. default-role:: code
 .. contents:: Содержание
