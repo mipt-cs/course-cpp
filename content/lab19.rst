@@ -7,8 +7,6 @@
 .. default-role:: code
 .. contents:: Содержание
 
-:status: draft
-
 
 Постановка задачи
 =================
