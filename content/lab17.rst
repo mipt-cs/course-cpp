@@ -134,7 +134,7 @@ mpiCC -o myfile myfile.cpp
 
 Кроме того, есть подробнейшие руководства по  возможностям MPI  в сети, например__:
 
-.. __: 
+.. __: http://mpi.deino.net/mpi_functions/
 
 
 Задание 1
