@@ -62,7 +62,7 @@
  
 
 
-Непараллельный код перемножения матриц есть на сервере в файле /tmp/matrices/cgm.c 
+Непараллельный код перемножения матриц на векторы и решения систем линейных уравнений есть на сервере в файле /tmp/matrices/cgm.c . И также приведён ниже. 
 
 .. code-block:: c
 
@@ -187,13 +187,16 @@
 		double *A;
 		double *b;
 		double *x;
+	/* прочесть из файла матрицу левой части A */
 		read_matrix(argv[1], &A, &M, &N);
 		if (M != N) {
 			printf("Only square matrix are supported. Current matrix %dx%d.\n", M, N);
 			exit(1);
 		}
 		int N1, M1;
+	/* прочесть из файла матрицу правой части b */
 		read_matrix(argv[2], &b, &M1, &N1);
+	/* проверка совпадения размерностей */
 		if (M1 * N1 != N) {
 			printf("Invalid b size %d.\n", M1 * N1);
 			exit(1);
