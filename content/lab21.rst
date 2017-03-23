@@ -233,3 +233,132 @@
 		free(x);
 		return 0;
 	}
+
+
+Пример параллеьного кода, умножающего матрицы:
+
+
+.. code-block:: c
+
+	#include "mpi.h"
+	#include <stdio.h>
+
+	#define NRA 30 /* number of rows in matrix A */
+	#define NCA 30 /* number of columns in matrix A */
+	#define NCB 10   /* number of columns in matrix B */
+
+	#define MASTER 0 /* taskid of MASTER task */
+	#define FROM_MASTER 1 /* setting a message type */
+	#define FROM_WORKER 2 /* setting a message type */
+	#define M_C_W MPI_COMM_WORLD
+
+	int main(int argc, char *argv[]) 
+	{
+
+	  int  numtasks,           /* number of tasks in partition */
+	       taskid,             /* a task identifier */
+	       numworkers, /* number of worker tasks */
+	       source,             /* task id of message source */
+	       dest,               /* task id of message destination */
+	       rows,               /* rows of matrix A sent to each worker */
+	       averow, extra, offset, /* used to determine rows sent to each worker */
+	       i, j, k, rc; /* indexes */
+	      
+	      double a[NRA][NCA], /* matrix A to be multiplied */
+	             b[NCA][NCB], /* matrix B to be multiplied */
+	             c[NRA][NCB], /* result matrix C */
+	             t1,t2; // time’s momemts
+	      
+	      MPI_Status status;
+
+	  rc = MPI_Init(&argc,&argv);
+	  rc|= MPI_Comm_size(M_C_W, &numtasks);
+	  rc|= MPI_Comm_rank(M_C_W, &taskid);
+	  if (rc != MPI_SUCCESS)
+	     printf ("error initializing MPI and obtaining task ID information\n");
+	  else
+	     printf ("task ID = %d\n", taskid);
+	  numworkers = numtasks-1;
+
+	  /**************************** master task ************************************/
+	  if (taskid == MASTER)
+	  {
+	      printf("Number of worker tasks = %d\n",numworkers);
+	      for (i=0; i<NRA; i++)
+	        for (j=0; j<NCA; j++)
+	           a[i][j]= i+j;
+
+	      for (i=0; i<NCA; i++)
+	        for (j=0; j<NCB; j++)
+	           b[i][j] = i*j;
+
+	    /* send matrix data to the worker tasks */
+	        averow = NRA/numworkers;
+	        extra = NRA%numworkers;
+	        offset = 0;
+
+	      t1=MPI_Wtime(); // get start time’s moment
+
+	    for (dest=1; dest<=numworkers; dest++)
+	    {
+	        rows = (dest <= extra) ? averow+1 : averow;
+	        printf("...sending %d rows to task %d\n", rows, dest);
+	        MPI_Send(&offset, 1, MPI_INT, dest, FROM_MASTER, M_C_W);
+	        MPI_Send(&rows, 1, MPI_INT, dest, FROM_MASTER, M_C_W);
+	        MPI_Send(&a[offset][0], rows*NCA, MPI_DOUBLE, dest, FROM_MASTER, M_C_W);
+	        MPI_Send(&b, NCA*NCB, MPI_DOUBLE, dest, FROM_MASTER, M_C_W);
+	        offset += rows;
+	    }
+
+	    /* wait for results from all worker tasks */
+	    for (source=1; source<=numworkers; source++)
+	    {
+	        MPI_Recv(&offset, 1, MPI_INT, source, FROM_WORKER, M_C_W, &status);
+	        MPI_Recv(&rows, 1, MPI_INT, source, FROM_WORKER, M_C_W, &status);
+	        MPI_Recv(&c[offset][0], rows*NCB, MPI_DOUBLE, source, FROM_WORKER, M_C_W, &status);
+	    }
+
+	    t2=MPI_Wtime(); // get ended time’s momemt
+	    printf ("Multiply time= %.3lf sec\n\n", t2-t1);
+	    /*
+	    printf("Here is the result matrix:\n");
+	    for (i=0; i<NRA; i++)
+	    {
+	        printf("\n");
+	        for (j=0; j<NCB; j++)
+	          printf("%6.2f ", c[i][j]);
+	    }
+	    printf ("\n");
+	    */
+	  }
+
+	  /**************************** worker task ************************************/
+	  if (taskid > MASTER)
+	  {
+	    MPI_Recv(&offset, 1, MPI_INT, MASTER, FROM_MASTER, M_C_W, &status);
+	    MPI_Recv(&rows, 1, MPI_INT, MASTER, FROM_MASTER, M_C_W, &status);
+	    MPI_Recv(&a, rows*NCA, MPI_DOUBLE, MASTER, FROM_MASTER, M_C_W, &status);
+	    MPI_Recv(&b, NCA*NCB, MPI_DOUBLE, MASTER, FROM_MASTER, M_C_W, &status);
+
+	    //printf( "task = %d, offset = %d, rows = %d\n", taskid, offset, rows );
+	    for (k=0; k<NCB; k++)
+	    { 
+	      for (i=0; i<rows; i++)
+	      {
+	        c[i][k] = 0.0;
+	        for (j=0; j<NCA; j++) 
+	        {
+	          c[i][k] += a[i][j] * b[j][k];
+	        }
+	      }
+	    }
+	    MPI_Send(&offset, 1, MPI_INT, MASTER, FROM_WORKER, M_C_W);
+	    MPI_Send(&rows, 1, MPI_INT, MASTER, FROM_WORKER, M_C_W);
+	    MPI_Send(&c, rows*NCB, MPI_DOUBLE, MASTER, FROM_WORKER, M_C_W);
+	    //printf( "task = %d, has finished\n", taskid );
+	  }
+
+
+	  MPI_Finalize();
+	  } // end of MM_MPI_2.C program
+
