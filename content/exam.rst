@@ -38,11 +38,11 @@
 ============
 
 #. Клеточные автоматы (на примере игры <<Жизнь>>)
-#. Виртуальные топологии
+#. Виртуальные топологии (принципы)
 #. Декомпозиция по данным, MPI_Status_ignore
 #. Топологии, MPI_Cart_create() и MPI_Cart_coords()
 #. Топологии, MPI_Cart_sub(), MPI_Cart_rank()
-#. Топологии, MPI_Cart_Cart_get(), MPI_Cartdim_get()
+#. Топологии, MPI_Cart_get(), MPI_Cartdim_get()
 #. MPI_Cart_shift() и векторные операции
 #. Декомпозиции неравномерных сеток
 #. Функции ожидания: MPI_Wait(), MPI_Test(), использование MPI_Status()
