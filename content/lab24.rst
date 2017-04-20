@@ -35,6 +35,8 @@
 Задание
 -------
 Модифицируйте игру жизнь из предыдущего занятия - добавьте поддержку декартовой топологии.
-Заготовка кода лежит в файле /tmp/life/life_2d_dec_noexchange.c
+Заготовка кода лежит в файле /tmp/life/life_2d_dec_noexchange.c__
+
+.. __: {filename}/extra/life_2d_dec_noexchange.c
 
 
