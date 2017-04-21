@@ -13,12 +13,13 @@
 #define LIFE_SIZE ((l->lx + 2 * gs) * (l->ly + 2 * gs))
 #define LIFE_CHECK_X(i) (((i) >= l->ox) && ((i) < l->ox + l->lx))
 #define LIFE_CHECK_Y(j) (((j) >= l->oy) && ((j) < l->oy + l->ly))
-#define LIFE_CHECK(i, j) LIFE_CHECK_X(i) && LIFE_CHECK_Y(j)
+#define LIFE_CHECK(i, j) LIFE_CHECK_X(i) && LIFE_CHECK_Y(j) //см. в life_mpi_init , проверка на принадлежность области ответственности данного процесса
 #define lind(i, j) (i + gs + (j + gs) * l->lx)
 #define gind(i, j) lind(i - l->ox, j - l->oy)
 
 
 typedef struct {
+	/* Переменные, общие для всех процессов.*/
 	int nx, ny;
 	int *u0;
 	int *u1;
@@ -26,14 +27,14 @@ typedef struct {
 	int save_steps;
 	
 	/* Переменные для MPI. */
-	int ox, oy;
-	int lx, ly;
+	int ox, oy; //сдвиг области ответственности относительно (0,0)
+	int lx, ly; //размер области ответственности данного процесса
 
 	int rank;
-	int coords[2];
-	MPI_Comm comm;
-	MPI_Comm cartcomm;
-	int dims[2];
+	int coords[2]; // координаты процесса в 2-мерном коммуникаторе (типа (0,1) - первый сверху, второй слева)
+	MPI_Comm comm; // исходный коммуникатор
+	MPI_Comm cartcomm; // 2-мерный коммуникатор 
+	int dims[2]; // размеры области ответственности
 } life_t;
 
 void life_mpi_init(const char *path, life_t *l, int dims[2], MPI_Comm c);
@@ -45,6 +46,7 @@ void life_save_vtk(const char *path, life_t *l);
 void life_data_save_vtk(const char *path, life_t *l, int *data);
 
 void make_decomposition(const int n, const int size, const int rank, int *o, int *l);
+void life_exchange(/*!!!*/);//!!!
 
 int main(int argc, char **argv)
 {
@@ -59,11 +61,13 @@ int main(int argc, char **argv)
 	}
 	if (!rank) printf("Running on %d CPUs.\n", size);
 	int dims[2] = {0, 0};
+
+	/*Создаём 2-мерную (размерность - второй аргумент) схему соединения  процессов. size - число процессовв изначальном коммуникаторе, в dims пишутся размеры таблицы разметки зон ответственности по горизонтали и вертикали*/
 	MPI_Dims_create(size, 2, dims);
 	if (!rank) printf("Creating cart topology (%d, %d).\n", dims[0], dims[1]);
 	
-	life_t l;
-	life_mpi_init(argv[1], &l, dims, MPI_COMM_WORLD);
+	life_t l; //структура , хранящая куски поля игры для каждого процесса
+	life_mpi_init(argv[1], &l, dims, MPI_COMM_WORLD); //функция, создающая соединение процессов с учётом взаимногорасположения зон ответственности и новый коммуникатор (см .далее), используется в данной программе вместо life_init
 	int i;
 	char buf[100];
 	for (i = 0; i < l.steps; i++) {
@@ -74,7 +78,11 @@ int main(int argc, char **argv)
 			life_mpi_collect(&l, &u, 0);
 			if (!l.rank) life_data_save_vtk(buf, &l, u);
 			if (u) free(u);
-		}
+		 }
+/*!!!
+ * Здесь нужно вызвать функцию, которая осуществляет обмен данными между процессами с соседними зонами ответственности, а именно, отправляет краевые значения соседям и получает их от соседей.
+ * Можно также вызывать её из life_step() или добавить туда соответствующие строки (8 отправок и 8 приёмов)
+ * !!!*/
 		life_step(&l);
 	}
 	
@@ -91,29 +99,8 @@ int main(int argc, char **argv)
  * nx ny
  * i1 j2
  * i2 j2
- */
-void life_init(const char *path, life_t *l)
-{
-	FILE *fd = fopen(path, "r");
-	assert(fd);
-	assert(fscanf(fd, "%d\n", &l->steps));
-	assert(fscanf(fd, "%d\n", &l->save_steps));
-	printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
-	assert(fscanf(fd, "%d %d\n", &l->nx, &l->ny));
-	printf("Field size: %dx%d\n", l->nx, l->ny);
-
-	l->u0 = (int*)calloc(l->nx * l->ny, sizeof(int));
-	l->u1 = (int*)calloc(l->nx * l->ny, sizeof(int));
-	
-	int i, j, r, cnt;
-	cnt = 0;
-	while ((r = fscanf(fd, "%d %d\n", &i, &j)) != EOF) {
-		l->u0[ind(i, j)] = 1;
-		cnt++;
-	}
-	printf("Loaded %d life cells.\n", cnt);
-	fclose(fd);
-}
+ * 
+*/
 
 void life_mpi_init(const char *path, life_t *l, int dims[2], MPI_Comm c)
 {
@@ -128,17 +115,19 @@ void life_mpi_init(const char *path, life_t *l, int dims[2], MPI_Comm c)
 
 
 	/* Создаем декартову топологию. */
-	int periods[2] = {1, 1};
-	int reorder = 0;
+	int periods[2] = {1, 1}; //тор
+	int reorder = 0; //запрещено MPI самостоятельно перенумеровывать процессы
 	MPI_Cart_create(l->comm, 2, dims, periods, reorder, &l->cartcomm);
+	/* l->cartcomm - новый коммуникатор с теми же процессами, но с 2-мерной нумерацией*/
 	
-	MPI_Comm_rank(l->cartcomm, &l->rank);
-	MPI_Cart_coords(l->cartcomm, l->rank, 2, l->coords);
+	MPI_Comm_rank(l->cartcomm, &l->rank);//раздаёт процессам их новые ранги
+	MPI_Cart_coords(l->cartcomm, l->rank, 2, l->coords);//раздаёт процессам координаты зон ответственности
 	if (!l->rank) printf("Steps %d, save every %d step.\n", l->steps, l->save_steps);
 	if (!l->rank) printf("Field size: %dx%d\n", l->nx, l->ny);
 	
-	make_decomposition(l->nx, dims[0], l->coords[0], &l->ox, &l->lx);
-	make_decomposition(l->ny, dims[1], l->coords[1], &l->oy, &l->ly);
+	/* Обсчитывает ox,oy - смещения , и lx,ly - размеры зон ответственности процессов. dims[0] - размер таблицы зон ответственности по горизонтали, dims[1] - размер по вертикали, соответственно coords - номер зоны ответственности процесса по горизонтали и вертикали*/
+	make_decomposition(l->nx, dims[0], l->coords[0], &l->ox, &l->lx);// по горизонтали
+	make_decomposition(l->ny, dims[1], l->coords[1], &l->oy, &l->ly);// по вертикали
 	printf("My rank %d, my coords (%d, %d), my origin (%d, %d), my local size (%d, %d).\n", l->rank, l->coords[0], l->coords[1], l->ox, l->oy, l->lx, l->ly);
 	
 	l->u0 = (int*)calloc(LIFE_SIZE, sizeof(int));
@@ -146,6 +135,9 @@ void life_mpi_init(const char *path, life_t *l, int dims[2], MPI_Comm c)
 	
 	int i, j, r, lcnt, cnt;
 	lcnt = 0;
+	
+	/*Каждый процесс считает начальное число живых точек в своей зоне ответственности, потом все суммируются
+ *   и распечатываются*/
 	while ((r = fscanf(fd, "%d %d\n", &i, &j)) != EOF) {
 		if (LIFE_CHECK(i, j)) {
 			l->u0[gind(i, j)] = 1;
@@ -158,6 +150,7 @@ void life_mpi_init(const char *path, life_t *l, int dims[2], MPI_Comm c)
 	fclose(fd);
 }
 
+/* следующая функция собирает после обсчёта шага данные со всех процессов чтобы сохранить картинку в .vtk-файл */
 void life_mpi_collect(life_t *l, int **u, int rank_flag)
 {
 	int *ul = l->u0;
@@ -200,31 +193,6 @@ void life_free(life_t *l)
 	free(l->u0);
 	free(l->u1);
 	l->nx = l->ny = 0;
-}
-
-void life_save_vtk(const char *path, life_t *l)
-{
-	FILE *f;
-	int i1, i2, j;
-	f = fopen(path, "w");
-	assert(f);
-	fprintf(f, "# vtk DataFile Version 3.0\n");
-	fprintf(f, "Created by write_to_vtk2d\n");
-	fprintf(f, "ASCII\n");
-	fprintf(f, "DATASET STRUCTURED_POINTS\n");
-	fprintf(f, "DIMENSIONS %d %d 1\n", l->nx+1, l->ny+1);
-	fprintf(f, "SPACING %d %d 0.0\n", 1, 1);
-	fprintf(f, "ORIGIN %d %d 0.0\n", 0, 0);
-	fprintf(f, "CELL_DATA %d\n", l->nx * l->ny);
-	
-	fprintf(f, "SCALARS life int 1\n");
-	fprintf(f, "LOOKUP_TABLE life_table\n");
-	for (i2 = 0; i2 < l->ny; i2++) {
-		for (i1 = 0; i1 < l->nx; i1++) {
-			fprintf(f, "%d\n", l->u0[ind(i1, i2)]);
-		}
-	}
-	fclose(f);
 }
 
 void life_data_save_vtk(const char *path, life_t *l, int *data)
@@ -281,15 +249,29 @@ void life_step(life_t *l)
 	l->u1 = tmp;
 }
 
+/*де-факто возвращает значения o и l, то есть смещение элемента (0,0) и длину зоны ответственности по каждой из координат,  сохраняет их для каждого процесса в переменные по указтелям*/
 void make_decomposition(const int n, const int size, const int rank, int *o, int *l)
 {
-	int pp = n / size;
+	int pp = n / size; //вспомогательная переменная  - целочисленное частное соответствующего размера поля на число ячеек в таблице зон ответственности, на которое она делит соответствующую размерность
 	*l = pp + (n % size > rank);
 	*o = pp * rank;
+/* далее выравнивание зон ответственности для случая ненулевого остатка от деления (то есть почти всегда)*/
 	if (rank > n % size) {
 		*o += n % size;
 	} else {
 		*o += rank;
 	}
 }
-
+/*Рассмотрим пример с полем размером 1000*150 на 9 процессах с зонами ответственности по 3 в каждой строке и каждом столбце. Рассмотрим процесс номер (0,1), то есть первый сверху и второй слева
+ * По x:
+ * pp=1000/3=333;
+ * *l=333+(1000%3>0)=333+1=334;
+ * *o=333*0=0;
+ * (0>1000%3)=(0>1)=0 - false
+ * *o+=rank=0+0=0;
+ * По y:
+ * pp=150/3=50;
+ * *l=50+(150%3>1)=50+(0>1)=50;
+ * *o=50*1=50;
+ * (1>150%3)=(1>0)=1 - true
+ * 50+150%3=50+0=50;*/
