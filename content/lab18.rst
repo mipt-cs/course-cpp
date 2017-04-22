@@ -483,21 +483,21 @@ MPI_Allgather.
 		const int N = 100;
 		double x[N], TotalSum, ProcSum = 0.0;
 		int ProcRank, ProcNum, k, i1, i2;
-		MPI_Status Status;
+		MPI_Status Status; // Инициализация статуса MPI - данная переменная используется иногда при отправке и получении сообщений
 	
 		// Инициализация
-		MPI_Init( &argc, &argv );
-		MPI_Comm_size( MPI_COMM_WORLD, &ProcNum );
-		MPI_Comm_rank( MPI_COMM_WORLD, &ProcRank );
+		MPI_Init( &argc, &argv ); // Создаёт community из процессов
+		MPI_Comm_size( MPI_COMM_WORLD, &ProcNum ); //  Раздаёт всем процессам их число  - в переменную ProcNUm
+		MPI_Comm_rank( MPI_COMM_WORLD, &ProcRank );// Раздаёт каждому процессу его номер, начиная с нуля - в переменную ProcRank
 		
-		// Подготовка данных
+		// Подготовка данных, создание массива чисел на процессе номер 0. Можно , конечно, на всех сразу, но зачем создавать //нагрузки, которые можно не создавать? 
 		if ( ProcRank == 0 ) {
 			for( i1 = 0; i1 < N; ++i1 ) {
 				x[i1] = i1;
 			}
 		}
 		
-		// Рассылка данных на все процессы
+		// Рассылка данных на все процессы - коллективная операция
 		MPI_Bcast( x, N, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 
 		// Вычисление частичной суммы на каждом из процессов
@@ -509,14 +509,15 @@ MPI_Allgather.
 		for ( int i = i1; i < i2; i++ ) {
 			ProcSum = ProcSum + x[i];
 		}
-		
+		// Сбор частичных сумм с процессов - коллективная операция
 		MPI_Reduce( &ProcSum, &TotalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
 	
 		// Вывод результата
-		if ( ProcRank == 0 ) {
+		if ( ProcRank == 0 ) { // условная конструкция нужна. чтобы распечаткой занимался только один процесс, в данном случае нулевой
+		// Если проверки на номер процесса не будет - то каждый процесс распечатает по строке. 
 			printf("\nTotal Sum = %10.2f",TotalSum);
 		}
-		MPI_Finalize();
+		MPI_Finalize(); // Завершает использование MPI, освобождая все созданные MPI-процедурами переменные, они больше не будут //доступны, при этом все запущенные процессы никуда не деваются.
 		return 0;
 	}
 
