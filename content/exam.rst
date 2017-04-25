@@ -30,13 +30,15 @@
 #. Разновидности параллельных архитектур. SISM - MIMD
 #. Разновидности параллельных архитектур. Общая и разделяемая память
 #. MPI - определение и основные принципы, группы и коммуникаторы (MPI_COMM_WORLD, MPI_Comm_rank(),...)
+#. Собственные переменные MPI: MPI_COMMON_WORLD, MPI_Status
 #. MPI_Init() и MPI_Finalize()
-#. MPI_Send() и MPI_Recv()
+#. Операции P2P MPI_Send() и MPI_Recv()
 #. Блокирующие и неблокирующие посылки, MPI_Isend() и MPI_Irecv()
-#. Блокирующий и неблокирующий приём, MPI_Sendrecv() и MPI_Rsend()
+#. Блокирующие и неблокирующие сообщения: MPI_Bsend(), MPI_Brecv()
 #. MPI_Bcast()
 #. MPI_Reduce()
-#. MPI_Scatter() и MPI_Gather(), MPI_Barrier()
+#. Коллективные операции MPI_Scatter() и MPI_Gather(), MPI_Barrier()
+#. MPI_Scatterv(), MPI_Gatherv()
 #. Сортировки и их распараллеливание, all2all и  all2one
 #. Схемы взаимодействия процессов при сортировках
 #. Схема взаимодействия типа <<гиперкуб>> и её преимущества
@@ -53,12 +55,12 @@
 
 #. Клеточные автоматы (на примере игры <<Жизнь>>)
 #. Виртуальные топологии (принципы)
-#. Декомпозиция по данным, MPI_Status_ignore
+#. Декомпозиция по данным
 #. Топологии, MPI_Cart_create() и MPI_Cart_coords()
 #. Топологии, MPI_Cart_sub(), MPI_Cart_rank()
 #. Топологии, MPI_Cart_get(), MPI_Cartdim_get()
 #. MPI_Cart_shift() и векторные операции
-#. Коллективные и индивидуальные операции. Разница между MPI_Wait() и MPI_Barrier()
+#. Коллективные и point-to-point операции. Разница между MPI_Wait() и MPI_Barrier()
 #. Функции ожидания: MPI_Wait(), MPI_Test(), использование MPI_Status()
 
 
