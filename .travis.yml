@@ -1,29 +1,25 @@
 sudo: false
-
 language: python
 python:
-  - "3.5"
-
+- '3.5'
 install: pip install pelican beautifulsoup4
-
 before_script:
-  - base64 -d <<< $DEPLOY_KEYS | tar -xz -C $HOME
-
+- base64 -d <<< $DEPLOY_KEYS | tar -xz -C $HOME
 script:
-  - make html
-
+- make html
 branches:
   only:
-    - master
-
+  - master
 notifications:
-  email: false
-
+  email:
+    on_success: change
+    on_failure: always
+  slack:
+    secure: lO0TeFa0eM9XfYlv2/yDmxXbNe0Pwcf4SobfXidgTjyDS1gLQoLQvjwnC/r1rsGnBTDPOt8PIdJti4OZi7v84muBoC6IEXB4ny+6COUeQY0BWAi2dVqEaujkOBNH9wKQ4LPuFXl/zf0OrYebUfO7+Ln1jasYfGdah1iVYpyOGrlgVjsSq3vOXQRaDxEatYqx4PEY+4p6j/HPVq6i/wwRg1MLeeBjtLDHpNRwmoLrblm2bie8o+X/nBqJ3CgsDlX2mst+tan84TYd10fca/ua/uHOlurJzuncdEiFaAGB/67e+Z38B1Ackc1Cnrwum7Oe8K/TTJ3KJdEiWEwjM+yf4ch36hg0ErBcSP9+tnV4d4hcUgEFJjJn09AYNfGz6ZyXn9aBHN+asJZsHv7fv3W4S7qIjLVkQ/OJTAMegYZQhBsYEyYqYTeFQPG87r5VPdOPoxoyvJtDNWpW+d/4QFJIJ0RqWrTNqTGhhEhgqb4zV6agXcHASYxb7/xVm9x6hbA2cJEgffy9qXcgcHpyuIRWCLf0hmaz6+Ed9PtrLDjxI72X2JD3jpPjPLfW6/bu169583JhrnkAVtH/5QmLVczZUvKpHdJqI/uPgEuRC9WjGAstapAXTFMtA2EkJEw47agZ5nDUSj0uPQZQY7KiAZA032bqe38ur50nOmo6zbD36jA=
 addons:
   apt:
     packages:
-      - texlive-latex-recommended
-      - texlive-lang-cyrillic
-
+    - texlive-latex-recommended
+    - texlive-lang-cyrillic
 after_success:
-  - make rsync_upload
+- make rsync_upload
