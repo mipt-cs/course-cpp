@@ -1,7 +1,8 @@
 Сборка проекта на С++ в GNU/Linux
 #################################
 
-:date: 2017-09-03 09:00
+:date: 2016-09-01 09:00
+:lecture_link: https://youtu.be/rQYj-dsuW5Y
 
 .. default-role:: code
 .. contents:: Содержание

@@ -10,7 +10,7 @@ import sys
 sys.path.append(os.curdir)
 from pelicanconf import *
 
-SITEURL = 'http://judge.mipt.ru/mipt_cs_on_cpp_2016'
+SITEURL = 'http://judge.mipt.ru/mipt_cs_on_cpp'
 RELATIVE_URLS = False
 
 FEED_ALL_ATOM = None
