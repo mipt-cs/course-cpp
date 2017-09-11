@@ -14,6 +14,11 @@
 
 .. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=637302
 
+
+`Контест для группы 638.`__
+
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=638302
+
 Обратите внимание, что контест выполняется только в течение занятия (две пары) и его *результаты идут в рейтинг*.
 
 
