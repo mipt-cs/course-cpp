@@ -21,16 +21,16 @@
 
 `Контест для групп 641, 642, 643.`__
 
-.. __:http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=640302
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=640302
 
 
 `Контест для групп 5111, 5112, 5113, 5114.`__
 
-.. __:http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=510302
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=510302
 
 `Контест для группы 5115.`__
 
-.. __:http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=515302
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=515302
 
 
 Обратите внимание, что контест выполняется только в течение занятия (две пары) и его *результаты идут в рейтинг*.
