@@ -16,10 +16,5 @@ notifications:
     on_failure: always
   slack:
     secure: sJAT2gkCx7X6QFyxAJVQu52Gbp9LrgHTrKY+gXgd6jjPIEMvpO8psaGRAeXHvNT3q5UIK9YYlSptw+WQzaLdEnddpaSolC4SNeGjOYw6jOyu3bl0THYva1dgQbnJNrttTF9oAjbG8oF2BMRS229VRr74lqb3NV7h6POom+9819LRgm1Nd7cjlsrQYmQN86XHXHkosxWDDHv9xsROFKENb2RIaW7E1R3XpCbhwQ2W6BD6GXRwRPVAr1rZzGYCAxGb/nlXuGv2hGBCFqsnq3B7R3s6IsBb+fv+VmMqZkTAtYUaxMYE026naAO/NKaYTDrmgceN423UsnTqGfhXBF5LGVdw3DfRRAJHI/P6/up9pW3OJpCNPiP/46TUh4agovybjhi+3c4qlOoBLhaFAYMvcmqaI07DmRHjjvmNrDm7gJI0ZGSJ2F65IDiIrrZhKspiyZ7r2DugYf7jkLkYp1RoDxyWLLd2qj74xcT4KvrcPG3ICUn7OkzDX+kuA+ZEFpesUaQsRT1eInrlhMhjVkZxPjdZTiqWjC9qVg9K6b8tHxxznSV8o0LYYQ7w/wdZVfF6g0YWRU35GicpE5slxnHmzYGLjxWCvFEx+QDrKhL1/nFpyfRtiTCDCrhGgDltoFri+oX4VzAinN4ygfwGgMaIzNf369fKrHvAd0x7FDtPlpc=
-addons:
-  apt:
-    packages:
-    - texlive-latex-recommended
-    - texlive-lang-cyrillic
 after_success:
 - make rsync_upload
