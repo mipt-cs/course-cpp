@@ -1,0 +1,454 @@
+Динамическая память
+###################
+
+:date: 2017-09-21 23:00
+:status: draft
+
+
+.. default-role:: code
+.. contents:: Содержание
+
+Введение
+========
+
+Динамическая память выделяется и освобождается — с помощью специальных инструкций (т. е. по инициативе разработчика). Это позволяет по ходу работы программы контролировать и корректировать объём используемой памяти и, следовательно, создавать программы способные обрабатывать большие объёмы данных, обходя ограниченность физической памяти машины.
+
+Доступ к динамической памяти возможен только через указатели, т. е. нельзя создавать в неё переменные, но можно выделять её фрагменты и связывать из с некоторым указателем.
+
+
+Выделение и освобождение участков памяти
+========================================
+
+Существует несколько способов выделения динамической памяти:
+
+#. Функция malloc().  Память выделяется из сектора оперативной памяти доступного для любых программ, выполняемых на данной машине. Аргументом функции является количество байт памяти, которую необходимо выделить, возвращает функция — указатель на выделенный блок в памяти. Содержание выделенного блока памяти не инициализируется, оно остается с неопределенными значениями.
+#. Функция calloc(). Выделяет блок памяти для массива размером — num элементов, каждый из которых занимает size байт, и инициализирует все свои биты в нулями.
+#. Оператор new. Выделяет для обьекта память из области свободной памяти. После встречи компилятором ключевого слова new им генерируется вызов конструктора класса
+#. Оператор new[]. Используется при создании динамических массивов. После успешного выделения памяти для каждого из элементов массива вызывается конструктор по умолчанию.
+
+
+Освобождение памяти:
+
+#. Функция free. Освобождает блок памяти, ранее выделенный с помощью вызова malloc, calloc. 
+#. Оператор delete.   Возвращает память, выделенную оператором new, обратно в кучу.
+#. Оператор delete[]. Для всех элементов массива вызываются деструкторы. С помощью оператора delete освобождается память, занимаемая массивом.
+
+После освобождения памяти посредством вызова функции free(ptr), хорошей практикой является сброс указателя в нуль, то есть присвоить ptr = 0. Если указателю присвоить 0, указатель становится нулевым, другими словами, он уже никуда не указывает. Всегда после высвобождения памяти, присваивайте указателю 0, в противном случае, даже после высвобождения памяти, указатель все равно на неё указывает, а значит вы случайно можете нанести вред другим программам, которые, возможно будут использовать эту память, но вы даже ничего об этом не узнаете и будете думать, что программа работает корректно.
+
+Использование оператора delete на указателе на объект, который не был создан при помощи оператора new, создает непрогнозируемый результат. Однако можно оператор delete может использоваться на указателе со значением 0. Это означает, что, если оператор new возвращает 0 при сбое, то результат такой операции new можно удалить без опасных последствий. 
+Bспользование формы, предназначенной для массивов (delete [ ]), для удаления одиночного объекта и использовании формы, не предназначенной для массивов, для удаления массива дают неопределенный результат.
+
+Примеры использования функций:
+
+malloc/free:
+
+.. code-block:: c
+
+	#include <iostream>
+	#include <cstdlib>
+	 
+	int main()
+	{
+	  int len;
+	 
+	  std::cout << "Укажите кол-во элементов массива: ";
+	  std::cin >> len;
+	 
+	  int * buffer = (int*) malloc(len*sizeof(int));
+	  if (buffer==NULL) exit (1);                       // если выделение памяти не выполнилось, завершить программу
+	 
+	  for (int i = 0; i < len; i++)
+	    buffer[i] = rand();
+
+	  for (int i = 0; i < len; i++)
+	    std::cout << buffer[i] << std::endl;
+
+	  free(buffer);                                     // освобождаем память
+
+	  return 0;
+	}
+
+
+calloc/free:
+
+.. code-block:: c
+
+	#include <iostream>
+	#include <cstdlib>
+	 
+	int main()
+	{
+	  int len;
+	 
+	  std::cout << "Укажите кол-во элементов массива: ";
+	  std::cin >> len;
+	 
+	  int * buffer = (int*) calloc(len,sizeof(int));
+	  if (buffer==NULL) exit (1);                       // если выделение памяти не выполнилось, завершить программу
+	 
+	  for (int i = 0; i < len; i++)
+	    buffer[i] = rand();
+
+	  for (int i = 0; i < len; i++)
+	    std::cout << buffer[i] << std::endl;
+
+	  free(buffer);                                     // освобождаем память
+
+	  return 0;
+	}
+
+
+new/delete:
+
+.. code-block:: c
+
+	#include <iostream>
+	 
+	int main(int argc, char* argv[])
+	{
+	 int *p = new int; // динамическое выделение памяти под объект типа int
+	 *p = 10; // инициализация объекта через указатель
+
+	 //int *p = new int (10); инициализация может выполнятся сразу при объявлении динамического объекта
+	 cout << "value = " << *p << endl;
+	 delete p; 
+
+	return 0;
+	}
+
+
+new[]/delete[]:
+
+.. code-block:: c
+
+	#include <iostream>
+	#include <cstdlib>
+	 
+	int main()
+	{
+	  int len;
+	 
+	  std::cout << "Укажите кол-во элементов массива: ";
+	  std::cin >> len;
+	 
+	  int * buffer = new int[len];
+
+	  for (int i = 0; i < len; i++)
+	    buffer[i] = rand();
+
+	  for (int i = 0; i < len; i++)
+	    std::cout << buffer[i] << std::endl;
+
+	   delete [] buffer;                                     // освобождаем память
+
+	  return 0;
+	}
+
+
+Рассмотрим фрагмент кода, в котором показано, как объявляется двумерный динамический массив.
+
+.. code-block:: c
+	
+	float **ptr = new float* [2]; // две строки в массиве
+	for (int i = 0; i < 2; i++)
+		ptr[i] = new float [5]; // и пять столбцов
+		//  где ptr  – массив указателей на выделенный участок памяти под массив вещественных чисел  типа float
+
+
+Сначала объявляется указатель второго  порядка float \*\*ptr, который ссылается на массив указателей  float\* [2], где размер массива равен двум. После чего в цикле for каждой строке массива объявленного в строке 2 выделяется память под пять элементов. В результате получается двумерный динамический массив  ptr[2][5]. Рассмотрим пример высвобождения памяти отводимой под двумерный динамический массив.
+
+.. code-block:: c
+
+    for (int i = 0; i < 2; i++)
+        delete [] ptr[i]; //где 2 – количество строк в массиве
+
+
+Объявление и удаление двумерного динамического массива выполняется с помощью цикла, так как показано выше, необходимо понять и  запомнить то, 
+как это делается. Разработаем программу, в которой создадим двумерный динамический массив.
+
+.. code-block:: c
+ 
+	#include "stdafx.h"
+	#include <iostream>
+	#include <ctime>
+	#include <iomanip>
+	using namespace std;
+	 
+	int main(int argc, char* argv[])
+	{
+	    float **ptr = new float* [2]; // две строки в массиве
+	    for (int i = 0; i < 2; i++)
+	        ptr[i] = new float [5]; // и пять столбцов
+
+	    // заполнение массива
+	    for (int count_row = 0; count_row < 2; count_row++)
+	        for (int count_column = 0; count_column < 5; count_column++)
+	            ptr[count_row][count_column] = rand(); //заполнение массива случайными числами с масштабированием от 1 до 10
+	    
+	    // вывод массива
+	    for (int count_row = 0; count_row < 2; count_row++)
+	    {
+	        for (int count_column = 0; count_column < 5; count_column++)
+	            cout << ptr[count_row][count_column] << "   ";
+	        cout << endl;
+	    }
+	    
+	    // удаление двумерного динамического массива
+	    for (int i = 0; i < 2; i++)
+	        delete []ptr[i];
+
+	    return 0;
+	}
+
+
+Valgrind
+========
+
+Valgrind хорошо известен как мощное средство поиска ошибок работы с памятью. Но кроме этого, в его составе имеется некоторое количество дополнительных утилит, предназначенных для профилирования программ, анализа потребления памяти и поиска ошибок связанных с синхронизацией в многопоточных программах.
+Работа с valgrind достаточно проста -- его поведение полностью управляется опциями командной строки, а также не требует специальной подготовки программы, которую необходимо проанализировать (Хотя все-таки рекомендуется пересобрать программу с отладочной информацией и отключенной оптимизацией используя флаги компиляции -g и -O0). Если программа запускается командой "программа аргументы", то для ее запуска под управлением valgrind, необходимо в начало этой командной строки добавить слово valgrind, и указать опции, необходимые для его работы.
+
+Например, так:
+
+.. code-block:: c
+
+        valgrind --leak-check=full --leak-resolution=med программа аргументы
+
+
+что приведет к запуску нужной программы c заданными аргументами, и для нее будет проведен поиск утечек памяти. Если в проекте нет утечки памяти, вывод будет похож на этот
+
+.. code-block:: c
+
+	==1234== HEAP SUMMARY:
+	==1234== in use at exit: 16 bytes in 1 blocks
+	==1234== total heap usage: 5 allocs, 4 frees, 80 bytes allocated
+	==1234==
+	==1234== LEAK SUMMARY:
+	==1234== definitely lost: 16 bytes in 1 blocks
+	==1234== indirectly lost: 0 bytes in 0 blocks
+	==1234== possibly lost: 0 bytes in 0 blocks
+	==1234== still reachable: 0 bytes in 0 blocks
+	==1234== suppressed: 0 bytes in 0 blocks
+	==1234== Rerun with —leak-check=full to see details of leaked memory
+	==1234==
+	==1234== For counts of detected and suppressed errors, rerun with: -v
+	==1234== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+	(1234 — идентификатор процесса в системе, он будет отличаться от запуска к запуску.)
+
+
+В случае если память выделенная malloc/new не освобождается, то при запуске valgrind будет показан список вызовов malloc/new которые не имеют последующих вызовов free/delete. Рассмотрим пример:
+
+.. code-block:: c
+
+	int main()
+	{
+	    char *ix = new char [5]; // или, char *ix = malloc(5) для языка СИ
+	    return 0;
+	}
+
+При использовании valgrind будут показаны вызовы malloc/new не имеющие последующих вызовов free/delete:
+
+
+.. code-block:: c
+
+	==1234== HEAP SUMMARY:
+	==1234== in use at exit: 5 bytes in 1 blocks
+	==1234== total heap usage: 1 allocs, 0 frees, 5 bytes allocated
+
+Eсли мы перекомпилировать код с отладочной информацией (добавлением параметра -g в g++), мы получим более полезную информацию:
+
+.. code-block:: c
+
+	==15635== HEAP SUMMARY:
+	==15635== in use at exit: 5 bytes in 1 blocks
+	==15635== total heap usage: 1 allocs, 0 frees, 5 bytes allocated
+	==15635==
+	==15635== 10 bytes in 1 blocks are definitely lost in loss record 1 of 1
+	==15635== at 0x4C2BAD7: operator new[](unsigned long) (vg_replace_malloc.c:363)
+	==15635== by 0x400575: main (man.cpp:3)
+
+Теперь мы знаем точную строку, где был вызов new - man.cpp:3. Хотя отслеживание места, где необходимо освободить память, еще под вопросом, по крайней мере, становится понятно, с чего начать поиск. 
+Иногда --leak-check=yes не показывает все утечки памяти. Чтобы найти абсолютно все непарные вызовы free или new, необходимо использовать --show-reachable=yes. Вывод программы будет почти точно такой же, но он будет показывать больше неосвобождённой памяти.
+
+Valgrind может также показывать неверное использование памяти с помощью инструмента Memcheck. Например, если выделить массив импользуя malloc или new, а затем попытаться получить доступ к элементу за пределами массива:
+
+.. code-block:: c
+
+	int main()
+	{
+	    char *ptr = new char [5];
+	    ptr[6] = 'a';
+	    return 0;
+	}
+
+
+Скомпилируем в g++  этот исходник и в терминале вводим команду запуска valgrind:
+
+.. code-block:: c
+
+	g++ -g myprog.cpp
+	valgrind —tool=memcheck —leak-check=yes ‘/home/student/a.out’
+
+
+В получим следующую информацию:
+
+.. code-block:: c
+
+	==1234== Invalid write of size 1
+	==1234== at 0x400582: main (man.cpp:4)
+	==1234== Address 0x5a0504a is 0 bytes after a block of size 5 alloc’d
+	==1234== at 0x4C2BAD7: operator new[](unsigned long) (vg_replace_malloc.c:363)
+	==1234== by 0x400575: main (man.cpp:3)
+
+Данный вывод указывает на то, что используется указатель, выделенный для 5 байт, за пределами этого диапазона и происходит Invalid write. Если бы программа пыталась читать из этой памяти, то предупреждение было бы Invalid read of size num, где num — это объем памяти, который программа пытается прочитать. (Для char это будет один, а для int это будет либо 2, либо 4, в зависимости разрядности системы.) 
+Valgrind также выводит трассировку стека вызовов функций, так что точно известно, где произошла ошибка.
+
+Другой тип операции, которую обнаруживает Valgrind, это использование неинициализированного значения в условном операторе. Например, выполнив следующий код:
+
+.. code-block:: c
+
+	#include <iostream>
+	 
+	int main()
+	{
+	    int num;
+	    if(num == 1)   
+	        std::cout << "num == 1"; // или printf() для языка Си   
+	    return 0;
+	}
+
+через Valgrind, получим следующий ответ:
+
+.. code-block:: c
+
+	==1234== Conditional jump or move depends on uninitialised value(s)
+	==1234== at 0x4006E0: main (man.cpp:6)
+
+
+Valgrind достаточно умен, чтобы знать, что, если переменной не присваивается значение, то эта переменная все еще находится в «неинициализированном» состоянии, а значит никаких операций с ней быть не должно, до тех пор пока она не инициализируется. Например, выполнив следующий код:
+
+.. code-block:: c#include <iostream>
+ 
+	int func(int val)
+	{
+	    if(val < 0)
+	    {
+	        std::cout << "val < 0" << std::endl;
+	    }
+	}
+	 
+	int main()
+	{
+	    int num;
+	    func(num);
+	}
+
+в Valgrind, результом будет следующее предупреждение:
+
+.. code-block:: c
+
+	==1234== Conditional jump or move depends on uninitialised value(s)
+	==1234== at 0x4006E3: func(int) (man.cpp:5)
+	==1234== by 0x400707: main (man.cpp:14)
+
+
+Из вывода valgrind следует, что проблема была в func, и что остальная часть вызовов стека, вероятно, не так уж важна. Но так как main предоставляет неинициализированное значение в foo (не присваивается значение num), то необходимо начать искать и отслеживать путь присвоения переменных, пока не будет найдена неициализированная переменная. Это будет обнаружено только если на самом деле будет вызвана та ветвь кода, и, в частности, тот условный оператор. 
+
+Valgrind также умеет обнаруживать другие случаи неправильного использования памяти: если вызывается delete  дважды с одним и тем же значением указателя, то выводится следующее сообщение:
+
+.. code-block:: c
+
+	==16441== Invalid free() / delete / delete[] / realloc()
+
+
+Valgrind не выполняет проверку границ в статических массивах (выделенных в стеке). Так что если объявить массив внутри функции:
+
+.. code-block:: c
+
+	int main()
+	{
+	    char string[5];
+	    string[6] = 'c';
+	}
+
+
+то Valgrind не предупредит о выходе за пределы массива. Одно из возможных решений для тестирования — просто изменить статические массивы на динамически выделяемые, где будет проанализирована проверка на границы, хотя это может внести дополнительную путаницу связанную с вызовами delete.
+
+AddressSanitizer
+================
+
+AddressSanitizer - библиотека, разработанная компанией Google, предназначенная для поиска следующих ошибок при работе с памятью:
+
+#. Использование указателя после освобождения памяти
+#. Выход за пределы массива, выделенного в куче
+#. Выход за пределы массива, выделенного в стеке
+#. Выход за пределы глобального массива
+#. Передача указателя на локальную переменную функции в return
+#. Использование указателя на переменную за пределами ее области видимости
+#. Утечки памяти
+
+Рассмотрим пример:
+
+.. code-block:: c
+
+	// clang -O -g -fsanitize=address myprog.cpp && ./a.out
+	
+	int main(int argc, char **argv) {
+	  int *array = new int[100];
+	  delete [] array;
+	  return array[argc];  // BOOM
+	}
+
+В результате работы программы будет выдан следующая информация, указывающая на использование указателя после его удаления:
+
+.. code-block:: c
+
+	==26775==ERROR: AddressSanitizer: heap-use-after-free on address 0xb5d03e44 at pc 0x08048637 bp 0xbfc4ac28 sp 0xbfc4ac18
+	READ of size 4 at 0xb5d03e44 thread T0
+	    #0 0x8048636 in main test.cpp:4
+	    #1 0xb7090636 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18636)
+	    #2 0x8048500  (/home/pashkoff/a.out+0x8048500)
+
+	0xb5d03e44 is located 4 bytes inside of 400-byte region [0xb5d03e40,0xb5d03fd0)
+	freed by thread T0 here:
+	    #0 0xb72c6434 in operator delete[](void*) (/usr/lib/i386-linux-gnu/libasan.so.2+0x98434)
+	    #1 0x804860b in main test.cpp:3
+	    #2 0xb7090636 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18636)
+
+	previously allocated by thread T0 here:
+	    #0 0xb72c5e46 in operator new[](unsigned int) (/usr/lib/i386-linux-gnu/libasan.so.2+0x97e46)
+	    #1 0x80485f9 in main test.cpp:2
+	    #2 0xb7090636 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18636)
+
+	SUMMARY: AddressSanitizer: heap-use-after-free test.cpp:4 main
+	Shadow bytes around the buggy address:
+	  0x36ba0770: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	  0x36ba0780: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	  0x36ba0790: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	  0x36ba07a0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	  0x36ba07b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	=>0x36ba07c0: fa fa fa fa fa fa fa fa[fd]fd fd fd fd fd fd fd
+	  0x36ba07d0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+	  0x36ba07e0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+	  0x36ba07f0: fd fd fd fd fd fd fd fd fd fd fa fa fa fa fa fa
+	  0x36ba0800: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	  0x36ba0810: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+	Shadow byte legend (one shadow byte represents 8 application bytes):
+	  Addressable:           00
+	  Partially addressable: 01 02 03 04 05 06 07 
+	  Heap left redzone:       fa
+	  Heap right redzone:      fb
+	  Freed heap region:       fd
+	  Stack left redzone:      f1
+	  Stack mid redzone:       f2
+	  Stack right redzone:     f3
+	  Stack partial redzone:   f4
+	  Stack after return:      f5
+	  Stack use after scope:   f8
+	  Global redzone:          f9
+	  Global init order:       f6
+	  Poisoned by user:        f7
+	  Container overflow:      fc
+	  Array cookie:            ac
+	  Intra object redzone:    bb
+	  ASan internal:           fe
+	==26775==ABORTING
