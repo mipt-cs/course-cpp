@@ -368,12 +368,6 @@ Row) и используется во многих библиотеках, пр�
 .. __: https://ru.wikipedia.org/wiki/Python
 .. __: https://ru.wikipedia.org/wiki/Список_файловых_систем
 
-.. __: https://docs.python.org/3.5/library/functions.html#sum
-.. __: https://docs.python.org/3.5/library/functions.html#min
-.. __: https://docs.python.org/3.5/library/functions.html#max
-.. __: https://docs.python.org/3/library/statistics.html#statistics.mean
-.. __: https://docs.python.org/3/library/statistics.html#statistics.stdev
-
 Примерно так должны выглядеть результаты работы вашей программы:
 
 .. code-block:: text
