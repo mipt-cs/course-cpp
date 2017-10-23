@@ -199,8 +199,10 @@
 
    // Функция инициализиции итератора
    template<typename DataType>
-   list_iter_init(ListIterator<DataType> & it, List<DataType> & lst) {
+   ListIterator<DataType> list_iter_init(List<DataType> & lst) {
+       ListIterator<DataType> it;
        it.current = lst.begin;
+       return it;
     }
 
     // Возвращает true если текущий элемент итератора не последний
@@ -236,8 +238,7 @@
            list_insert(intList, i);
         }
 
-        ListIterator<int> iter;
-        list_iter_init(iter, intList);
+        ListIterator<int> iter = list_iter_init(intList);
 
         while(list_iter_has_next(iter)) {
            int * v = list_iter_next(iter);
@@ -255,8 +256,8 @@
     template<typename DataType>
     struct tNode2 {
         DataType data;
-        tNode<T>* next;
-        tNode<T>* prev;
+        tNode<DataType>* next;
+        tNode<DataType>* prev;
     }
 
 Из декларации `tNode2` следует , что каждый элемент занимает в памяти больше места по сравнению с односвязанным, и каждая операция изменения списка требует большего количества действий, поскольку нужно изменять значения двух указателей - `prev` и `next`. Использование двусвязных списков оправдано, когда требуется перемещаться от текущего элемента в обеих направлениях. 
