@@ -2,7 +2,6 @@
 ###########################
 
 :date: 2017-10-23 09:00
-:status: draft
 
 
 .. default-role:: code
