@@ -1,8 +1,7 @@
 Перегрузка операторов в С++  
 ###########################
 
-:date: 2016-10-13 03:00
-:lecture_link: https://youtu.be/Wj2jOYLpQDo
+:date: 2017-11-07 
 
 .. default-role:: code
 .. contents:: Содержание
@@ -289,7 +288,6 @@
 	int main(int argc, char **argv) {
 		Fraction a(-4, 7), b(1, 3), c(0, 4);
 		std::cout << c << " " << a * c << std::endl;
-		std::cout << (a < b) << " " << power(Fraction(1, 4), -1) << std::endl;
 	}
 
 Скопируйте и запустите код, приведенный выше, и убедитесь, что он работает корректно.
