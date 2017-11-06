@@ -11,6 +11,13 @@
 Ссылки на контесты
 ===================
 
+`Контест для группы 637.`__
+
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=637309
+
+`Контест для группы 638.`__
+
+.. __: http://judge2.vdi.mipt.ru/cgi-bin/new-client?contest_id=638309
 
 `Контест для групп 5111, 5112, 5113, 5114.`__
 
