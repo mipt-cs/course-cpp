@@ -1,7 +1,7 @@
 Шаблоны: класс размерной величины
 #################################
 
-:date: 2016-11-16 20:00
+:date: 2017-11-20 20:00
 :lecture_link: https://youtu.be/Vy9l5PDZpBw
 
 .. default-role:: code
