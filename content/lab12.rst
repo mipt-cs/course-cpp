@@ -2,7 +2,6 @@
 ######################
 
 :date: 2017-11-20 14:00
-:lecture_link: https://youtu.be/WBvpET-bpiI
 
 .. default-role:: code
 .. contents:: Содержание
@@ -10,12 +9,13 @@
 Заготовка игры
 ==============
 
-Сделайте форк репозитория `arithmetical_dragons`__ Или скачайте архив `здесь`__.
+Скачайте архив с папкой `arithmetical_dragons`__. (Оригинальный `репозиторий здесь`__ )
 
-.. __: https://github.com/mipt-cs-on-cpp/arithmetical_dragons.git
 .. __: ../extra/lab12/arithmetical_dragons.zip 
+.. __: https://github.com/mipt-cs-on-cpp/arithmetical_dragons.git
 
-Добейтесь работоспособности игры:
+Добейтесь работоспособности игры
+================================
 
 #. Создайте необходимые методы у класса `Hero` (`addScore(int)` `getScore()`);
 #. Создайте классы `RedDragon` (задаёт вопросы про вычитание) и `BlackDragon` (задаёт вопросы про умножени) по аналогии с `GreenDragon`;
