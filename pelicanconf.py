@@ -4,9 +4,9 @@ from __future__ import unicode_literals
 
 import os
 
-AUTHOR = 'Alexey Ermakov'
-SITENAME = 'Курс информатики на C++'
-SITEURL = ''
+AUTHOR = 'Ivan Makarov'
+SITENAME = 'ООП на C++ (новый стандарт)'
+SITEURL = 'http://cs.mipt.ru/cpp'
 
 PATH = 'content'
 

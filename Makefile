@@ -13,10 +13,10 @@ FTP_HOST=localhost
 FTP_USER=anonymous
 FTP_TARGET_DIR=/
 
-SSH_HOST=judge.mipt.ru
-SSH_PORT=2326
-SSH_USER=ejudge
-SSH_TARGET_DIR=/var/www/html/mipt_cs_on_cpp
+SSH_HOST=remote.vdi.mipt.ru
+SSH_PORT=50298
+SSH_USER=tkhirianov
+SSH_TARGET_DIR=/usr/share/nginx/html/cpp
 
 S3_BUCKET=my_s3_bucket
 
